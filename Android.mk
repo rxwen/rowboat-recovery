@@ -20,30 +20,30 @@ LOCAL_CFLAGS += -DRECOVERY_API_VERSION=$(RECOVERY_API_VERSION)
 
 LOCAL_STATIC_LIBRARIES :=
 
-ifeq ($(TARGET_USERIMAGES_USE_EXT4), true)
-LOCAL_CFLAGS += -DUSE_EXT4
-LOCAL_C_INCLUDES += system/extras/ext4_utils
-LOCAL_STATIC_LIBRARIES += libext4_utils libz
-endif
+#ifeq ($(TARGET_USERIMAGES_USE_EXT4), true)
+#LOCAL_CFLAGS += -DUSE_EXT4
+#LOCAL_C_INCLUDES += $(LOCAL_PATH)/../../system/extras/ext4_utils
+#LOCAL_STATIC_LIBRARIES += libext4_utils libz
+#endif
 
 # This binary is in the recovery ramdisk, which is otherwise a copy of root.
 # It gets copied there in config/Makefile.  LOCAL_MODULE_TAGS suppresses
 # a (redundant) copy of the binary in /system/bin for user builds.
 # TODO: Build the ramdisk image in a more principled way.
 
-LOCAL_MODULE_TAGS := eng
+#LOCAL_MODULE_TAGS := eng
 
 ifeq ($(TARGET_RECOVERY_UI_LIB),)
   LOCAL_SRC_FILES += default_recovery_ui.c
 else
   LOCAL_STATIC_LIBRARIES += $(TARGET_RECOVERY_UI_LIB)
 endif
-LOCAL_STATIC_LIBRARIES += libext4_utils libz
+LOCAL_STATIC_LIBRARIES += libz
 LOCAL_STATIC_LIBRARIES += libminzip libunz libmtdutils libmincrypt
-LOCAL_STATIC_LIBRARIES += libminui libpixelflinger_static libpng libcutils
+LOCAL_STATIC_LIBRARIES += libminui libpixelflinger_static libcutils
 LOCAL_STATIC_LIBRARIES += libstdc++ libc
 
-LOCAL_C_INCLUDES += system/extras/ext4_utils
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/../../system/extras/ext4_utils
 
 include $(BUILD_EXECUTABLE)
 
