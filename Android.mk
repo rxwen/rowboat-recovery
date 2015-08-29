@@ -14,6 +14,8 @@ LOCAL_SRC_FILES := \
 LOCAL_MODULE := recovery
 
 LOCAL_FORCE_STATIC_EXECUTABLE := true
+LOCAL_MODULE_PATH := $(TARGET_ROOT_OUT_SBIN)
+LOCAL_UNSTRIPPED_PATH := $(TARGET_ROOT_OUT_SBIN_UNSTRIPPED)
 
 RECOVERY_API_VERSION := 3
 LOCAL_CFLAGS += -DRECOVERY_API_VERSION=$(RECOVERY_API_VERSION)
@@ -31,7 +33,7 @@ LOCAL_STATIC_LIBRARIES :=
 # a (redundant) copy of the binary in /system/bin for user builds.
 # TODO: Build the ramdisk image in a more principled way.
 
-#LOCAL_MODULE_TAGS := eng
+LOCAL_MODULE_TAGS := optional
 
 ifeq ($(TARGET_RECOVERY_UI_LIB),)
   LOCAL_SRC_FILES += default_recovery_ui.c
