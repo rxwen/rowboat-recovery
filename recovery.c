@@ -732,14 +732,20 @@ int
 main(int argc, char **argv) {
     time_t start = time(NULL);
 
-    // If these fail, there's not really anywhere to complain...
-    freopen(TEMPORARY_LOG_FILE, "a", stdout); setbuf(stdout, NULL);
-    freopen(TEMPORARY_LOG_FILE, "a", stderr); setbuf(stderr, NULL);
-    printf("Starting recovery on %s", ctime(&start));
+    /*printf("Starting recovery on %s, open %s ", ctime(&start), TEMPORARY_LOG_FILE);*/
+    /*// If these fail, there's not really anywhere to complain...*/
+    /*freopen(TEMPORARY_LOG_FILE, "a", stdout); */
+    /*printf("Starting recovery 1on %s", ctime(&start));*/
+    /*setbuf(stdout, NULL);*/
+    /*printf("Starting recovery 2on %s", ctime(&start));*/
+    /*freopen(TEMPORARY_LOG_FILE, "a", stderr); */
+    /*printf("Starting recovery 3on %s", ctime(&start));*/
+    /*setbuf(stderr, NULL);*/
+    printf("Starting recovery 4on %s", ctime(&start));
 
-    device_ui_init(&ui_parameters);
-    ui_init();
-    ui_set_background(BACKGROUND_ICON_INSTALLING);
+    /*device_ui_init(&ui_parameters);*/
+    /*ui_init();*/
+    /*ui_set_background(BACKGROUND_ICON_INSTALLING);*/
     load_volume_table();
     get_args(&argc, &argv);
 
@@ -787,7 +793,7 @@ main(int argc, char **argv) {
     }
     printf("\n");
 
-    property_list(print_property, NULL);
+    /*property_list(print_property, NULL);*/
     printf("\n");
 
     int status = INSTALL_SUCCESS;
