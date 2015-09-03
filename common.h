@@ -33,7 +33,8 @@ void ui_clear_key_queue();
 // Write a message to the on-screen log shown with Alt-L (also to stderr).
 // The screen is small, and users may need to report these messages to support,
 // so keep the output short and not too cryptic.
-void ui_print(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
+//void ui_print(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
+#define ui_print(...) fprintf(stdout, "U:" __VA_ARGS__)
 
 // Display some header text followed by a menu of items, which appears
 // at the top of the screen (in place of any scrolling ui_print()
@@ -73,11 +74,11 @@ void ui_show_indeterminate_progress();
 // Hide and reset the progress bar.
 void ui_reset_progress();
 
-#define LOGE(...) ui_print("E:" __VA_ARGS__)
+#define LOGE(...) fprintf(stdout, "E:" __VA_ARGS__)
 #define LOGW(...) fprintf(stdout, "W:" __VA_ARGS__)
 #define LOGI(...) fprintf(stdout, "I:" __VA_ARGS__)
 
-#if 0
+#if 1
 #define LOGV(...) fprintf(stdout, "V:" __VA_ARGS__)
 #define LOGD(...) fprintf(stdout, "D:" __VA_ARGS__)
 #else
