@@ -741,7 +741,7 @@ main(int argc, char **argv) {
     /*freopen(TEMPORARY_LOG_FILE, "a", stderr); */
     /*printf("Starting recovery 3on %s", ctime(&start));*/
     /*setbuf(stderr, NULL);*/
-    printf("Starting recovery 4on %s", ctime(&start));
+    ui_print("Starting recovery on %s\n", ctime(&start));
 
     /*device_ui_init(&ui_parameters);*/
     /*ui_init();*/
