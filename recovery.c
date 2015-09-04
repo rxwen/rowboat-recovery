@@ -148,38 +148,38 @@ check_and_fclose(FILE *fp, const char *name) {
 
 // command line args come from, in decreasing precedence:
 //   - the actual command line
-//   - the bootloader control block (one per line, after "recovery")
+//   - the bootloader control block (one per line, after "recovery") #disable it, not using it
 //   - the contents of COMMAND_FILE (one per line)
 static void
 get_args(int *argc, char ***argv) {
     struct bootloader_message boot;
     memset(&boot, 0, sizeof(boot));
-    get_bootloader_message(&boot);  // this may fail, leaving a zeroed structure
+    //get_bootloader_message(&boot);  // this may fail, leaving a zeroed structure
 
-    if (boot.command[0] != 0 && boot.command[0] != 255) {
-        LOGI("Boot command: %.*s\n", sizeof(boot.command), boot.command);
-    }
+    /*if (boot.command[0] != 0 && boot.command[0] != 255) {*/
+        /*LOGI("Boot command: %.*s\n", sizeof(boot.command), boot.command);*/
+    /*}*/
 
-    if (boot.status[0] != 0 && boot.status[0] != 255) {
-        LOGI("Boot status: %.*s\n", sizeof(boot.status), boot.status);
-    }
+    /*if (boot.status[0] != 0 && boot.status[0] != 255) {*/
+        /*LOGI("Boot status: %.*s\n", sizeof(boot.status), boot.status);*/
+    /*}*/
 
-    // --- if arguments weren't supplied, look in the bootloader control block
-    if (*argc <= 1) {
-        boot.recovery[sizeof(boot.recovery) - 1] = '\0';  // Ensure termination
-        const char *arg = strtok(boot.recovery, "\n");
-        if (arg != NULL && !strcmp(arg, "recovery")) {
-            *argv = (char **) malloc(sizeof(char *) * MAX_ARGS);
-            (*argv)[0] = strdup(arg);
-            for (*argc = 1; *argc < MAX_ARGS; ++*argc) {
-                if ((arg = strtok(NULL, "\n")) == NULL) break;
-                (*argv)[*argc] = strdup(arg);
-            }
-            LOGI("Got arguments from boot message\n");
-        } else if (boot.recovery[0] != 0 && boot.recovery[0] != 255) {
-            LOGE("Bad boot message\n\"%.20s\"\n", boot.recovery);
-        }
-    }
+    /*// --- if arguments weren't supplied, look in the bootloader control block*/
+    /*if (*argc <= 1) {*/
+        /*boot.recovery[sizeof(boot.recovery) - 1] = '\0';  // Ensure termination*/
+        /*const char *arg = strtok(boot.recovery, "\n");*/
+        /*if (arg != NULL && !strcmp(arg, "recovery")) {*/
+            /**argv = (char **) malloc(sizeof(char *) * MAX_ARGS);*/
+            /*(*argv)[0] = strdup(arg);*/
+            /*for (*argc = 1; *argc < MAX_ARGS; ++*argc) {*/
+                /*if ((arg = strtok(NULL, "\n")) == NULL) break;*/
+                /*(*argv)[*argc] = strdup(arg);*/
+            /*}*/
+            /*LOGI("Got arguments from boot message\n");*/
+        /*} else if (boot.recovery[0] != 0 && boot.recovery[0] != 255) {*/
+            /*LOGE("Bad boot message\n\"%.20s\"\n", boot.recovery);*/
+        /*}*/
+    /*}*/
 
     // --- if that doesn't work, try the command file
     if (*argc <= 1) {
@@ -209,7 +209,7 @@ get_args(int *argc, char ***argv) {
         strlcat(boot.recovery, (*argv)[i], sizeof(boot.recovery));
         strlcat(boot.recovery, "\n", sizeof(boot.recovery));
     }
-    set_bootloader_message(&boot);
+    /*set_bootloader_message(&boot);*/
 }
 
 static void
@@ -274,9 +274,10 @@ finish_recovery(const char *send_intent) {
     chmod(LAST_INSTALL_FILE, 0644);
 
     // Reset to mormal system boot so recovery won't cycle indefinitely.
-    struct bootloader_message boot;
-    memset(&boot, 0, sizeof(boot));
-    set_bootloader_message(&boot);
+    /*struct bootloader_message boot;*/
+    /*memset(&boot, 0, sizeof(boot));*/
+    /*set_bootloader_message(&boot);*/
+    system("fw_setenv nandsrcaddr `mtd-part-offset kernel`");
 
     // Remove the command file, so recovery won't repeat indefinitely.
     if (ensure_path_mounted(COMMAND_FILE) != 0 ||
