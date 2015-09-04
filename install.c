@@ -210,6 +210,7 @@ load_keys(const char* filename, int* numKeys) {
             if (fscanf(f, " , %u", &(key->rr[i])) != 1) goto exit;
         }
         fscanf(f, " } } ");
+        key->exponent = 65537;
 
         // if the line ends in a comma, this file has more keys.
         switch (fgetc(f)) {
