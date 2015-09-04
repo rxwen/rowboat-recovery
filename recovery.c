@@ -48,11 +48,11 @@ static const struct option OPTIONS[] = {
   { NULL, 0, NULL, 0 },
 };
 
-static const char *COMMAND_FILE = "/cache/recovery/command";
-static const char *INTENT_FILE = "/cache/recovery/intent";
-static const char *LOG_FILE = "/cache/recovery/log";
-static const char *LAST_LOG_FILE = "/cache/recovery/last_log";
-static const char *LAST_INSTALL_FILE = "/cache/recovery/last_install";
+static const char *COMMAND_FILE = "/data/recovery/command";
+static const char *INTENT_FILE = "/data/recovery/intent";
+static const char *LOG_FILE = "/data/recovery/log";
+static const char *LAST_LOG_FILE = "/data/recovery/last_log";
+static const char *LAST_INSTALL_FILE = "/data/recovery/last_install";
 static const char *CACHE_ROOT = "/cache";
 static const char *SDCARD_ROOT = "/sdcard";
 static const char *TEMPORARY_LOG_FILE = "/tmp/recovery.log";
@@ -265,19 +265,18 @@ finish_recovery(const char *send_intent) {
     }
 
     // Copy logs to cache so the system can find out what happened.
-    copy_log_file(TEMPORARY_LOG_FILE, LOG_FILE, true);
-    copy_log_file(TEMPORARY_LOG_FILE, LAST_LOG_FILE, false);
-    copy_log_file(TEMPORARY_INSTALL_FILE, LAST_INSTALL_FILE, false);
-    chmod(LOG_FILE, 0600);
-    chown(LOG_FILE, 1000, 1000);   // system user
-    chmod(LAST_LOG_FILE, 0640);
-    chmod(LAST_INSTALL_FILE, 0644);
+    /*copy_log_file(TEMPORARY_LOG_FILE, LOG_FILE, true);*/
+    /*copy_log_file(TEMPORARY_LOG_FILE, LAST_LOG_FILE, false);*/
+    /*copy_log_file(TEMPORARY_INSTALL_FILE, LAST_INSTALL_FILE, false);*/
+    /*chmod(LOG_FILE, 0600);*/
+    /*chown(LOG_FILE, 1000, 1000);   // system user*/
+    /*chmod(LAST_LOG_FILE, 0640);*/
+    /*chmod(LAST_INSTALL_FILE, 0644);*/
 
     // Reset to mormal system boot so recovery won't cycle indefinitely.
     /*struct bootloader_message boot;*/
     /*memset(&boot, 0, sizeof(boot));*/
     /*set_bootloader_message(&boot);*/
-    system("fw_setenv nandsrcaddr `mtd-part-offset kernel`");
 
     // Remove the command file, so recovery won't repeat indefinitely.
     if (ensure_path_mounted(COMMAND_FILE) != 0 ||
@@ -285,7 +284,7 @@ finish_recovery(const char *send_intent) {
         LOGW("Can't unlink %s\n", COMMAND_FILE);
     }
 
-    ensure_path_unmounted(CACHE_ROOT);
+    /*ensure_path_unmounted(CACHE_ROOT);*/
     sync();  // For good measure.
 }
 
@@ -584,7 +583,7 @@ update_directory(const char* path, const char* unmount_when_done,
                 ensure_path_unmounted(unmount_when_done);
             }
             if (copy) {
-                result = install_package(copy, wipe_cache, TEMPORARY_INSTALL_FILE);
+                result = install_package(copy, wipe_cache, LAST_INSTALL_FILE);
                 free(copy);
             } else {
                 result = INSTALL_ERROR;
