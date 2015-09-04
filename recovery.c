@@ -277,6 +277,7 @@ finish_recovery(const char *send_intent) {
     /*struct bootloader_message boot;*/
     /*memset(&boot, 0, sizeof(boot));*/
     /*set_bootloader_message(&boot);*/
+    system("fw_setenv nandsrcaddr `mtd-part-offset kernel`");
 
     // Remove the command file, so recovery won't repeat indefinitely.
     if (ensure_path_mounted(COMMAND_FILE) != 0 ||
@@ -828,6 +829,6 @@ main(int argc, char **argv) {
     time_t end = time(NULL);
 
     ui_print("Rebooting... on %s\n", ctime(&end));
-    android_reboot(ANDROID_RB_RESTART, 0, 0);
+    /*android_reboot(ANDROID_RB_RESTART, 0, 0);*/
     return EXIT_SUCCESS;
 }
