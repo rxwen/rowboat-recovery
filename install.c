@@ -33,7 +33,7 @@
 #include "roots.h"
 #include "verifier.h"
 
-#define ASSUMED_UPDATE_BINARY_NAME  "META-INF/com/google/android/update-binary"
+#define ASSUMED_UPDATE_BINARY_NAME  "META-INF/com/google/android/updater"
 #define PUBLIC_KEYS_FILE "/res/keys"
 
 // If the package contains an update binary, extract it and run it.
