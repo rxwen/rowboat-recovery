@@ -818,14 +818,16 @@ main(int argc, char **argv) {
         status = INSTALL_ERROR;  // No command specified
     }
 
-    if (status != INSTALL_SUCCESS) ui_set_background(BACKGROUND_ICON_ERROR);
-    if (status != INSTALL_SUCCESS || ui_text_visible()) {
-        prompt_and_wait();
-    }
+    /*if (status != INSTALL_SUCCESS) ui_set_background(BACKGROUND_ICON_ERROR);*/
+    /*if (status != INSTALL_SUCCESS || ui_text_visible()) {*/
+        /*prompt_and_wait();*/
+    /*}*/
 
     // Otherwise, get ready to boot the main system...
     finish_recovery(send_intent);
-    ui_print("Rebooting...\n");
+    time_t end = time(NULL);
+
+    ui_print("Rebooting... on %s\n", ctime(&end));
     android_reboot(ANDROID_RB_RESTART, 0, 0);
     return EXIT_SUCCESS;
 }
