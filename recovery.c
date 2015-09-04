@@ -733,15 +733,11 @@ int
 main(int argc, char **argv) {
     time_t start = time(NULL);
 
-    /*printf("Starting recovery on %s, open %s ", ctime(&start), TEMPORARY_LOG_FILE);*/
     /*// If these fail, there's not really anywhere to complain...*/
-    /*freopen(TEMPORARY_LOG_FILE, "a", stdout); */
-    /*printf("Starting recovery 1on %s", ctime(&start));*/
-    /*setbuf(stdout, NULL);*/
-    /*printf("Starting recovery 2on %s", ctime(&start));*/
-    /*freopen(TEMPORARY_LOG_FILE, "a", stderr); */
-    /*printf("Starting recovery 3on %s", ctime(&start));*/
-    /*setbuf(stderr, NULL);*/
+    freopen(LOG_FILE, "a", stdout); 
+    setbuf(stdout, NULL);
+    freopen(LOG_FILE, "a", stderr); 
+    setbuf(stderr, NULL);
     ui_print("Starting recovery on %s\n", ctime(&start));
 
     /*device_ui_init(&ui_parameters);*/
@@ -829,6 +825,6 @@ main(int argc, char **argv) {
     time_t end = time(NULL);
 
     ui_print("Rebooting... on %s\n", ctime(&end));
-    android_reboot(ANDROID_RB_RESTART, 0, 0);
+    /*android_reboot(ANDROID_RB_RESTART, 0, 0);*/
     return EXIT_SUCCESS;
 }
