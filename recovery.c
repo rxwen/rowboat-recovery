@@ -59,6 +59,7 @@ static const char *TEMPORARY_LOG_FILE = "/tmp/recovery.log";
 static const char *TEMPORARY_INSTALL_FILE = "/tmp/last_install";
 static const char *SIDELOAD_TEMP_DIR = "/tmp/sideload";
 
+static const char *VERSION = "v1.0.0";
 extern UIParameters ui_parameters;    // from ui.c
 
 /*
@@ -734,11 +735,11 @@ main(int argc, char **argv) {
     time_t start = time(NULL);
 
     /*// If these fail, there's not really anywhere to complain...*/
-    freopen(LOG_FILE, "a", stdout); 
+    freopen(LOG_FILE, "w", stdout); 
     setbuf(stdout, NULL);
-    freopen(LOG_FILE, "a", stderr); 
+    freopen(LOG_FILE, "w", stderr); 
     setbuf(stderr, NULL);
-    ui_print("Starting recovery on %s\n", ctime(&start));
+    ui_print("Starting recovery %s on %s\n", VERSION, ctime(&start));
 
     /*device_ui_init(&ui_parameters);*/
     /*ui_init();*/
