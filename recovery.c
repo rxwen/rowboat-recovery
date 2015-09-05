@@ -50,6 +50,7 @@ static const struct option OPTIONS[] = {
 
 static const char *COMMAND_FILE = "/data/recovery/command";
 static const char *INTENT_FILE = "/data/recovery/intent";
+static const char *RESULT_FILE = "/data/recovery/ota_result";
 static const char *LOG_FILE = "/data/recovery/log";
 static const char *LAST_LOG_FILE = "/data/recovery/last_log";
 static const char *LAST_INSTALL_FILE = "/data/recovery/last_install";
@@ -247,6 +248,31 @@ copy_log_file(const char* source, const char* destination, int append) {
     }
 }
 
+static void
+write_update_result(int result) {
+    FILE *fp = fopen_path(RESULT_FILE, "w");
+    if (fp == NULL) {
+        LOGE("Can't open %s\n", RESULT_FILE);
+    } else {
+        char buf[256] = {0};
+        time_t end = time(NULL);
+        switch(result) {
+            case INSTALL_SUCCESS:
+                snprintf(buf, sizeof buf, "%d %s %s", result, "INSTALL_SUCCESS", ctime(&end));
+                break;
+            case INSTALL_ERROR:
+                snprintf(buf, sizeof buf, "%d %s %s", result, "INSTALL_ERROR", ctime(&end));
+                break;
+            case INSTALL_CORRUPT:
+                snprintf(buf, sizeof buf, "%d %s %s", result, "INSTALL_CORRUPT", ctime(&end));
+                break;
+            default:
+                snprintf(buf, sizeof buf, "%d %s %s", result, "UNKNOWN_RESULT", ctime(&end));
+        }
+        fputs(buf, fp);
+        check_and_fclose(fp, RESULT_FILE);
+    }
+}
 
 // clear the recovery command and prepare to boot a (hopefully working) system,
 // copy our log file to cache as well (for the system to read), and
@@ -815,6 +841,7 @@ main(int argc, char **argv) {
     } else {
         status = INSTALL_ERROR;  // No command specified
     }
+    write_update_result(status);
 
     /*if (status != INSTALL_SUCCESS) ui_set_background(BACKGROUND_ICON_ERROR);*/
     /*if (status != INSTALL_SUCCESS || ui_text_visible()) {*/
