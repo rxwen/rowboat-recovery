@@ -853,6 +853,6 @@ main(int argc, char **argv) {
     time_t end = time(NULL);
 
     ui_print("Rebooting... on %s\n", ctime(&end));
-    /*android_reboot(ANDROID_RB_RESTART, 0, 0);*/
+    android_reboot(ANDROID_RB_RESTART, 0, 0);
     return EXIT_SUCCESS;
 }
