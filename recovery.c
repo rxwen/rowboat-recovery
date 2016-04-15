@@ -62,7 +62,7 @@ static const char *TEMPORARY_LOG_FILE = "/tmp/recovery.log";
 static const char *TEMPORARY_INSTALL_FILE = "/tmp/last_install";
 static const char *SIDELOAD_TEMP_DIR = "/tmp/sideload";
 
-static const char *VERSION = "v1.0.0";
+static const char *VERSION = "v1.1.0";
 extern UIParameters ui_parameters;    // from ui.c
 
 /*
