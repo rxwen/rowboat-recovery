@@ -57,6 +57,7 @@ static const char *LAST_LOG_FILE = "/data/recovery/last_log";
 static const char *LAST_INSTALL_FILE = "/data/recovery/last_install";
 static const char *CACHE_ROOT = "/cache";
 static const char *SDCARD_ROOT = "/sdcard";
+static const char *COMMAND_FILE_SD = "/sdcard/recovery/command";
 static const char *TEMPORARY_LOG_FILE = "/tmp/recovery.log";
 static const char *TEMPORARY_INSTALL_FILE = "/tmp/last_install";
 static const char *SIDELOAD_TEMP_DIR = "/tmp/sideload";
@@ -149,6 +150,28 @@ check_and_fclose(FILE *fp, const char *name) {
     fclose(fp);
 }
 
+static int get_args_from_command_file(const char* command_file, int *argc, char ***argv) {
+    FILE *fp = fopen_path(command_file, "r");
+    if (fp != NULL) {
+        char *argv0 = (*argv)[0];
+        *argv = (char **) malloc(sizeof(char *) * MAX_ARGS);
+        (*argv)[0] = argv0;  // use the same program name
+
+        char buf[MAX_ARG_LENGTH];
+        for (*argc = 1; *argc < MAX_ARGS; ++*argc) {
+            if (!fgets(buf, sizeof(buf), fp)) break;
+            (*argv)[*argc] = strdup(strtok(buf, "\r\n"));  // Strip newline.
+        }
+
+        check_and_fclose(fp, command_file);
+        LOGI("Got arguments from %s\n", command_file);
+        return 0;
+    } else {
+        LOGW("Failed to open command file %s, err: %d\n", command_file, errno);
+        return -1;
+    }
+}
+
 // command line args come from, in decreasing precedence:
 //   - the actual command line
 //   - the bootloader control block (one per line, after "recovery") #disable it, not using it
@@ -186,22 +209,9 @@ get_args(int *argc, char ***argv) {
 
     // --- if that doesn't work, try the command file
     if (*argc <= 1) {
-        FILE *fp = fopen_path(COMMAND_FILE, "r");
-        if (fp != NULL) {
-            char *argv0 = (*argv)[0];
-            *argv = (char **) malloc(sizeof(char *) * MAX_ARGS);
-            (*argv)[0] = argv0;  // use the same program name
-
-            char buf[MAX_ARG_LENGTH];
-            for (*argc = 1; *argc < MAX_ARGS; ++*argc) {
-                if (!fgets(buf, sizeof(buf), fp)) break;
-                (*argv)[*argc] = strdup(strtok(buf, "\r\n"));  // Strip newline.
-            }
-
-            check_and_fclose(fp, COMMAND_FILE);
-            LOGI("Got arguments from %s\n", COMMAND_FILE);
-        } else {
-            LOGW("Failed to open command file %s, err: %d\n", COMMAND_FILE, errno);
+        if(0 != get_args_from_command_file(COMMAND_FILE, argc, argv) &&
+            0 != get_args_from_command_file(COMMAND_FILE_SD, argc, argv)) {
+            LOGE("failed to get args from all command files\n");
         }
     }
 
