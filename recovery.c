@@ -51,7 +51,8 @@ static const struct option OPTIONS[] = {
 static const char *COMMAND_FILE = "/data/recovery/command";
 static const char *INTENT_FILE = "/data/recovery/intent";
 static const char *RESULT_FILE = "/data/recovery/ota_result";
-static const char *LOG_FILE = "/data/recovery/log";
+static const char *LOG_STDOUT_FILE = "/dev/ttyO0";
+static const char *LOG_STDERR_FILE = "/data/recovery/log";
 static const char *LAST_LOG_FILE = "/data/recovery/last_log";
 static const char *LAST_INSTALL_FILE = "/data/recovery/last_install";
 static const char *CACHE_ROOT = "/cache";
@@ -199,6 +200,8 @@ get_args(int *argc, char ***argv) {
 
             check_and_fclose(fp, COMMAND_FILE);
             LOGI("Got arguments from %s\n", COMMAND_FILE);
+        } else {
+            LOGW("Failed to open command file %s, err: %d\n", COMMAND_FILE, errno);
         }
     }
 
@@ -761,9 +764,9 @@ main(int argc, char **argv) {
     time_t start = time(NULL);
 
     /*// If these fail, there's not really anywhere to complain...*/
-    freopen(LOG_FILE, "w", stdout); 
+    freopen(LOG_STDOUT_FILE, "w", stdout); 
     setbuf(stdout, NULL);
-    freopen(LOG_FILE, "w", stderr); 
+    freopen(LOG_STDERR_FILE, "w", stderr); 
     setbuf(stderr, NULL);
     ui_print("Starting recovery %s on %s\n", VERSION, ctime(&start));
 
@@ -795,11 +798,11 @@ main(int argc, char **argv) {
 
     device_recovery_start();
 
-    printf("Command:");
+    LOGI("Command:\n");
     for (arg = 0; arg < argc; arg++) {
-        printf(" \"%s\"", argv[arg]);
+        LOGI(" \"%s\"\n", argv[arg]);
     }
-    printf("\n");
+    LOGI("\n");
 
     if (update_package) {
         // For backwards compatibility on the cache partition only, if
@@ -810,20 +813,20 @@ main(int argc, char **argv) {
             char* modified_path = malloc(len);
             strlcpy(modified_path, "/cache/", len);
             strlcat(modified_path, update_package+6, len);
-            printf("(replacing path \"%s\" with \"%s\")\n",
+            LOGI("(replacing path \"%s\" with \"%s\")\n",
                    update_package, modified_path);
             update_package = modified_path;
         }
     }
-    printf("\n");
 
     /*property_list(print_property, NULL);*/
-    printf("\n");
 
     int status = INSTALL_SUCCESS;
 
     if (update_package != NULL) {
+        LOGW("About to install package %s\n", update_package);
         status = install_package(update_package, &wipe_cache, TEMPORARY_INSTALL_FILE);
+        LOGW("Install package %s result %d\n", update_package, status);
         if (status == INSTALL_SUCCESS && wipe_cache) {
             if (erase_volume("/cache")) {
                 LOGE("Cache wipe (requested by package) failed.");
@@ -831,16 +834,20 @@ main(int argc, char **argv) {
         }
         if (status != INSTALL_SUCCESS) ui_print("Installation aborted.\n");
     } else if (wipe_data) {
+        LOGW("Wipe data command\n");
         if (device_wipe_data()) status = INSTALL_ERROR;
         if (erase_volume("/data")) status = INSTALL_ERROR;
         if (wipe_cache && erase_volume("/cache")) status = INSTALL_ERROR;
         if (status != INSTALL_SUCCESS) ui_print("Data wipe failed.\n");
     } else if (wipe_cache) {
+        LOGW("Wipe cache command\n");
         if (wipe_cache && erase_volume("/cache")) status = INSTALL_ERROR;
         if (status != INSTALL_SUCCESS) ui_print("Cache wipe failed.\n");
     } else {
+        LOGW("No command specified, nothing to do\n");
         status = INSTALL_ERROR;  // No command specified
     }
+    LOGW("update result is: %d\n", status);
     write_update_result(status);
 
     /*if (status != INSTALL_SUCCESS) ui_set_background(BACKGROUND_ICON_ERROR);*/
@@ -853,6 +860,6 @@ main(int argc, char **argv) {
     time_t end = time(NULL);
 
     ui_print("Rebooting... on %s\n", ctime(&end));
-    android_reboot(ANDROID_RB_RESTART, 0, 0);
+    /*android_reboot(ANDROID_RB_RESTART, 0, 0);*/
     return EXIT_SUCCESS;
 }
