@@ -51,7 +51,6 @@ static const struct option OPTIONS[] = {
 static const char *COMMAND_FILE = "/data/recovery/command";
 static const char *INTENT_FILE = "/data/recovery/intent";
 static const char *RESULT_FILE = "/data/recovery/ota_result";
-/*static const char *LOG_STDOUT_FILE = "/dev/ttyO0";*/
 static const char *LOG_STDOUT_FILE = "/data/recovery/log.out";
 static const char *LOG_STDERR_FILE = "/data/recovery/log.err";
 static const char *LAST_LOG_FILE = "/data/recovery/last_log";
@@ -775,9 +774,16 @@ main(int argc, char **argv) {
     time_t start = time(NULL);
 
     /*// If these fail, there's not really anywhere to complain...*/
-    freopen(LOG_STDOUT_FILE, "w", stdout); 
+    const char *no_reboot = getenv("NO_REBOOT");
+    ui_print("NO_REBOOT is %s\n", no_reboot);
+    if(no_reboot == NULL || strlen(no_reboot) == 0) {
+        freopen(LOG_STDOUT_FILE, "w", stdout); 
+        freopen(LOG_STDERR_FILE, "w", stderr); 
+    } else {
+        freopen("/dev/console", "w", stdout); 
+        freopen("/dev/console", "w", stderr); 
+    }
     setbuf(stdout, NULL);
-    freopen(LOG_STDERR_FILE, "w", stderr); 
     setbuf(stderr, NULL);
     ui_print("Starting recovery %s on %s\n", VERSION, ctime(&start));
 
@@ -870,8 +876,6 @@ main(int argc, char **argv) {
     finish_recovery(send_intent);
     time_t end = time(NULL);
 
-    const char *no_reboot = getenv("NO_REBOOT");
-    ui_print("NO_REBOOT is %s\n", no_reboot);
     if(no_reboot == NULL || strlen(no_reboot) == 0) {
         ui_print("Rebooting... on %s\n", ctime(&end));
         android_reboot(ANDROID_RB_RESTART, 0, 0);
